@@ -36,14 +36,33 @@ def viewalltheplacethingswithsearchyo():
                         if plc not in li:
                             li.append(plc)
         if "amenities" in body.keys():
+            alldaplaces = storage.all(Place)
+            alldaamties = body.get("amenities")
+            for daplace in alldaplaces.values():
+                flag = 0
+                plam = []
+                for am in daplace.amenities:
+                    plam.append(am.__dict__.get("id"))
+                for amty in alldaamties:
+                    if amty not in plam:
+                        flag = 1
+                if flag == 1:
+                    pass
+                else:
+                    if daplace not in li.copy():
+                        li.append(daplace)
+            '''
             for plc in li.copy():
-                for amty in body.get("amenities"):
+
                     actual = storage.get(Amenity, amty)
                     if actual not in plc.amenities:
                         li.pop(plc)
+            '''
         newli = []
-        for plc in li:
-            newli.append(plc.to_dict())
+        for plc in li.copy():
+            p = plc.to_dict()
+            p.pop("amenities", "")
+            newli.append(p)
         return jsonify(newli)
 
 
@@ -87,6 +106,8 @@ def placeidtime(place_id):
     if ptl is not None:
         sd = ptl.to_dict()
         if request.method == 'GET':
+            print("HELLOOOOOOOOOOOOOOOOOOOOOOOOOO")
+            print(ptl.amenities)
             return jsonify(sd)
         if request.method == 'DELETE':
             storage.delete(ptl)
